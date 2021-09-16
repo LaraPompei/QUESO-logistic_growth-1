@@ -1,0 +1,23 @@
+--------------------------------------------------------------------------------------------------------------
+QUESO Library: Version = 0.57.1 (5701)
+
+External Release
+
+Build Date   = Jul  1 2021 15:13:02
+Build Host   = pop-os
+Build User   = root
+Build Arch   = x86_64-unknown-linux-gnu
+Build Rev    = N/A
+
+C++ Config   = mpic++ -g -O2 -Wall
+
+Trilinos DIR = 
+GSL Libs     = -L/usr/local/lib -lgsl -lgslcblas -lm
+GRVY DIR     = 
+GLPK DIR     = 
+HDF5 DIR     = 
+--------------------------------------------------------------------------------------------------------------
+Beginning run at Thu Sep 16 15:05:57 2021
+
+Ending run at Thu Sep 16 15:05:58 2021
+Total run time = 1 seconds

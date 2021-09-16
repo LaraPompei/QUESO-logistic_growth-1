@@ -1,0 +1,47 @@
+###############################################
+# UQ Environment                              #
+###############################################
+env_numSubEnvironments   = 1                  # Number of number of chains and/or monte carlo sequences of samples [1]
+env_subDisplayFileName   = outputData/display # Output filenaame for sub-screen writing ["."]
+env_subDisplayAllowAll   = 0                  # Allows all subenvironments to write to output file [0]
+env_subDisplayAllowedSet = 0 1 2 3 4 5 6 7    # Subenvironments that will write to ouput file [""]
+env_displayVerbosity     = 2                  # set verbosity [0]
+env_seed                 = -1                 # Set seed, for differente chain samples must be negative [0] 
+
+#################################################
+# Statistical inverse problem (ip)              #
+#################################################
+ip_computeSolution      = 1                     # computes solution process [1]
+ip_dataOutputFileName   = outputData/sipOutput  # Name of data output file ["."]
+ip_dataOutputAllowedSet = 0 1                   # Subenvironment that will write to data output file [""]
+
+#############################################################################
+# 'ip_': information for Metropolis-Hastings algorithm                      #
+#############################################################################
+ip_mh_dataOutputFileName   = outputData/sipOutput                           # Name of data output file ["."]
+ip_mh_dataOutputAllowedSet = 0 1                                            # defines which subenvironments will write to data output file 
+
+ip_mh_rawChain_dataInputFileName    = .                                     # Name of date file that contains the raw chain ["."]
+ip_mh_rawChain_size                 = 200000                               # Size of the raw chain
+ip_mh_rawChain_generateExtra        = 0                                     # (?) [0]
+ip_mh_rawChain_displayPeriod        = 20000                                # [500]
+ip_mh_rawChain_measureRunTimes      = 1                                     # [1]
+ip_mh_rawChain_dataOutputFileName   = outputData/sipOutput_raw_chain        # ["."]
+ip_mh_rawChain_dataOutputAllowedSet = 0 1 2 3 4 5 6 7                       # (?)
+                                                                     
+ip_mh_displayCandidates             = 0                                     # [0]
+ip_mh_putOutOfBoundsInChain         = 0                                     # [1]
+ip_mh_dr_maxNumExtraStages          = 3                                     # defines how many extra candidates will be generated [0]
+ip_mh_dr_listOfScalesForExtraStages = 5. 10. 20.                            # defines a list s of scaling factors that will multiply the covariance matrix
+ip_mh_am_initialNonAdaptInterval    = 0                                     # defines the initial interval in which each adapted proposal covariance matrix will be used [0]
+ip_mh_am_adaptInterval              = 100                                   # defines the size of the interval which each adapted proposal covariance matrix will be used [0]
+ip_mh_am_eta                        = 1.928                                 # is a factor used to scale the proposal covariance matrix, usually set to be 2.4^2/d, where d is the dimention 
+                                                                            #of the prolem[1.]
+ip_mh_am_epsilon                    = 1.e-5                                 # is the covariance regularization factor used in the DRAM algorithm [1x10^-5]
+
+ip_mh_filteredChain_generate             = 1                                # [0]
+ip_mh_filteredChain_discardedPortion     = 0.                               # [0.]
+ip_mh_filteredChain_lag                  = 20                               # (?)
+ip_mh_filteredChain_dataOutputFileName   = outputData/sipOutput_filt_chain  # ["."]
+ip_mh_filteredChain_dataOutputAllowedSet = 0 1                              # ()
+

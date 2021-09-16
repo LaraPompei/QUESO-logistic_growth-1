@@ -1,6 +1,6 @@
 #include "compute.h"
 #include "likelihood.h"
-
+ 
 #define tam 100
 #define num_variaveis 2
 #define num_poi 4
@@ -8,6 +8,48 @@
 #define M 1
 #define Y0 1.0
 #define number_samples 10000
+#define spacing_points 0.5
+
+//Defining the time interval of the model to be used by the function integrate
+double t0 = 0.0;
+double t1 = 50.0;
+double dt = 0.1;
+
+
+double value_k = 0;
+double value_M = 0;
+int position = 0;
+double** data = new double*[number_samples];
+
+// Defining a shorthand for the type of the mathematical state
+typedef std::vector< double > state_type;
+typedef runge_kutta4<state_type> rk4; 
+
+
+// Defining the ODE and the params
+
+// System to be solved: dx/dt = k*x*(1-x/M) ~ Logistic Growth
+void my_system(const state_type& x , state_type& dxdt, const double& t){
+    dxdt[0] = value_k*x[0]*(1-x[0]/value_M);
+}
+
+void my_observer(const state_type& x, const double& t){
+    
+    if(t == 1*spacing_points){
+        data[position][0] = x[0]; 
+    }
+    else if(t == 3*spacing_points){
+        data[position][1] = x[0]; 
+    }
+    else if(t == 6*spacing_points){
+        data[position][2] = x[0]; 
+    }
+    else if(t == 30*spacing_points){
+        data[position][3] = x[0]; 
+    }
+	
+}
+
 
 void filling_matrix(double* t, double** data, double* values_m, double* values_k){
     mt19937 engine; // uniform random bit engine
@@ -24,12 +66,18 @@ void filling_matrix(double* t, double** data, double* values_m, double* values_k
     mu    = 15; //mean value of the normal distribution
     sigma = 1.0; //standard deviation of the normal distribution
     normal_distribution<double> normal_dist(mu,sigma);
-
+    
     //filling the matrix
     for (int i =0; i<number_samples; i++) {
+		state_type x = {1.0};
         values_k[i] = lognormal_dist(engine);
         values_m[i] = normal_dist(engine);
+		value_k = values_k[i];
+		value_M = values_m[i];
+		position = i;
         //chamar o odeint para preencher a matriz
+		integrate_const(rk4(), my_system, x , t0, t1, dt, my_observer);
+		cout  << value_k << " " << value_M << " " << data[i][0] << " " << data[i][1] << " " << data[i][2] << " " << data[i][3] << "\n";
     }
 }
 
@@ -59,11 +107,9 @@ void compute(const FullEnvironment& env){
 
     //instantiating the likelihood function object
     cerr<< "Instantiating the likelihood function object and generating the samples"<<endl;
-    double spacing_points = 0.5;
     double *t             = new double[tam];
     double* values_m      = new double[number_samples];
     double* values_k      = new double[number_samples];
-    double** data         = new double*[number_samples];
     double* data_mean     = new double[num_poi];
     double* data_std      = new double[num_poi];
     double* poi           = new double[num_poi]{1,3,6,30}; //defining the points in the time vector that will be used to fit the parameters (k and m) of the model
@@ -96,7 +142,7 @@ void compute(const FullEnvironment& env){
     cerr<<"Calculating the mean of the data"<<endl;
     for(int i = 0; i < num_poi;i++){
         for(int j=0; j<number_samples; j++){
-            data_mean[i] += data[j][i];
+            data_mean[i] += data[j][i]/number_samples;
         }
     }
     //standard deviation
@@ -109,11 +155,12 @@ void compute(const FullEnvironment& env){
         cerr<<"Para t = "<<i<<endl<<"Data mean: "<<data_mean[i]<<endl<<"Data standard deviation: "<<data_std[i]<<endl;
     }
 
-    cerr<<"Creating the likelihood object"<<endl;
     /*************************************************************************************************************************************
-     *                                              MEXER NA LIKELIHOO                                                                   *
+     *                                              MEXER NA LIKELIHOOD                                                                   *
      *************************************************************************************************************************************/
-    Likelihood<> lhood("like_", paramDomain, data_mean, t, data_std, poi, tam);
+/*
+    cerr<<"Creating the likelihood object"<<endl;    
+	Likelihood<> lhood("like_", paramDomain, data_mean, t, data_std, poi, tam);
     
     //defining the prior RV
     cerr<<"Defining the prior RV"<<endl;
@@ -140,7 +187,13 @@ void compute(const FullEnvironment& env){
               << ctime(&timevalNow.tv_sec)
               << std::endl;
     }
+	*/
 }
+
+
+// ************************* COMENTANDO PARA TESTAR O CÓDIGO BASE ********************
+
+/*
 
 void save_data(double* model, double** baseModel, double* data, double* values_of_a){
     fstream a_data, a_mcmc, model_data, model_mcmc;
@@ -170,3 +223,8 @@ void save_data(double* model, double** baseModel, double* data, double* values_o
 
     //writing mcmc model on file
 }
+
+
+*/
+
+

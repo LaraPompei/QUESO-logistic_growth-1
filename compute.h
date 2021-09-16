@@ -26,6 +26,8 @@ using namespace QUESO;
 using namespace std;
 using namespace boost::numeric::odeint;
 
+void my_system(const state_type& x , state_type& dxdt, const double& t);
+void my_observer(const state_type& x, const double& t);
 void compute(const FullEnvironment& env);
 void filling_matrix(double* t, double** data, double* values_m, double* values_k);
 void save_data(double* model, double** baseModel, double* data, double* values_of_a);
