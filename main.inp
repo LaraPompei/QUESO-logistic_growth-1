@@ -21,6 +21,12 @@ ip_dataOutputAllowedSet = 0 1                   # Subenvironment that will write
 ip_mh_dataOutputFileName   = outputData/sipOutput                           # Name of data output file ["."]
 ip_mh_dataOutputAllowedSet = 0 1                                            # defines which subenvironments will write to data output file 
 
+ip_mh_initialPosition_dataInputFileName          = . # inputData/initPos
+ip_mh_initialPosition_dataInputFileType          = m
+ip_mh_initialProposalCovMatrix_dataInputFileName = . # inputData/adaptedMatrix_am910000
+ip_mh_initialProposalCovMatrix_dataInputFileType = m
+
+
 ip_mh_rawChain_dataInputFileName    = .                                     # Name of date file that contains the raw chain ["."]
 ip_mh_rawChain_size                 = 200000                               # Size of the raw chain
 ip_mh_rawChain_generateExtra        = 0                                     # (?) [0]
@@ -30,11 +36,17 @@ ip_mh_rawChain_dataOutputFileName   = outputData/sipOutput_raw_chain        # ["
 ip_mh_rawChain_dataOutputAllowedSet = 0 1 2 3 4 5 6 7                       # (?)
                                                                      
 ip_mh_displayCandidates             = 0                                     # [0]
-ip_mh_putOutOfBoundsInChain         = 0                                     # [1]
-ip_mh_dr_maxNumExtraStages          = 3                                     # defines how many extra candidates will be generated [0]
-ip_mh_dr_listOfScalesForExtraStages = 5. 10. 20.                            # defines a list s of scaling factors that will multiply the covariance matrix
+ip_mh_putOutOfBoundsInChain         = 1
+ip_mh_tk_useLocalHessian            = 0
+ip_mh_tk_useNewtonComponent         = 1                                     # [1]
+ip_mh_dr_maxNumExtraStages          = 1                                     # defines how many extra candidates will be generated [0]
+ip_mh_dr_listOfScalesForExtraStages = 5. 4. 3.                            # defines a list s of scaling factors that will multiply the covariance matrix
 ip_mh_am_initialNonAdaptInterval    = 0                                     # defines the initial interval in which each adapted proposal covariance matrix will be used [0]
 ip_mh_am_adaptInterval              = 100                                   # defines the size of the interval which each adapted proposal covariance matrix will be used [0]
+ip_mh_am_adaptedMatrices_dataOutputPeriod   = 60000
+ip_mh_am_adaptedMatrices_dataOutputFileName = . # outputData/adaptedMatrix
+ip_mh_am_adaptedMatrices_dataOutputFileType = m
+
 ip_mh_am_eta                        = 1.928                                 # is a factor used to scale the proposal covariance matrix, usually set to be 2.4^2/d, where d is the dimention 
                                                                             #of the prolem[1.]
 ip_mh_am_epsilon                    = 1.e-5                                 # is the covariance regularization factor used in the DRAM algorithm [1x10^-5]

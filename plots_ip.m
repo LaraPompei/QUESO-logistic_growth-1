@@ -2,7 +2,7 @@ clear all;
 cd outputData/
 sipOutput_raw_chain
 sipOutput_filt_chain
-pkg load econometrics
+%pkg load econometrics
 
 % Chain plots -------------------------------------------------------------
 % RAW
