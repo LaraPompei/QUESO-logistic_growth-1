@@ -26,7 +26,11 @@ using namespace QUESO;
 using namespace std;
 using namespace boost::numeric::odeint;
 
-void my_system(const state_type& x , state_type& dxdt, const double& t);
+// Defining a shorthand for the type of the mathematical state
+typedef vector<double> state_type;
+typedef runge_kutta4<state_type> rk4;
+
+void my_system_boost(const state_type& x , state_type& dxdt, const double& t);
 void my_observer(const state_type& x, const double& t);
 void compute(const FullEnvironment& env);
 void filling_matrix(double* t, double** data, double* values_m, double* values_k);

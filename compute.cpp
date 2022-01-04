@@ -3,10 +3,8 @@
  
 #define tam 100
 #define num_variaveis 2
-#define num_poi 4
 #define K 0
 #define M 1
-#define Y0 1.0
 #define number_samples 10000
 #define spacing_points 0.5
 
@@ -29,7 +27,7 @@ typedef runge_kutta4<state_type> rk4;
 // Defining the ODE and the params
 
 // System to be solved: dx/dt = k*x*(1-x/M) ~ Logistic Growth
-void my_system(const state_type& x , state_type& dxdt, const double& t){
+void my_system_boost(const state_type& x , state_type& dxdt, const double& t){
     dxdt[0] = value_k*x[0]*(1-x[0]/value_M);
 }
 
@@ -69,15 +67,15 @@ void filling_matrix(double* t, double** data, double* values_m, double* values_k
     
     //filling the matrix
     for (int i =0; i<number_samples; i++) {
-		state_type x = {1.0};
+	state_type x = {1.0};
         values_k[i] = lognormal_dist(engine);
         values_m[i] = normal_dist(engine);
-		value_k = values_k[i];
-		value_M = values_m[i];
-		position = i;
+	value_k = values_k[i];
+	value_M = values_m[i];
+	position = i;
         //chamar o odeint para preencher a matriz
-		integrate_const(rk4(), my_system, x , t0, t1, dt, my_observer);
-		cout  << value_k << " " << value_M << " " << data[i][0] << " " << data[i][1] << " " << data[i][2] << " " << data[i][3] << "\n";
+	boost::numeric::odeint::integrate_const(rk4(), my_system_boost, x, t0, t1, dt, my_observer);
+	cout  << value_k << " " << value_M << " " << data[i][0] << " " << data[i][1] << " " << data[i][2] << " " << data[i][3] << "\n";
     }
 }
 
@@ -106,6 +104,7 @@ void compute(const FullEnvironment& env){
     BoxSubset<> paramDomain("param_", paramSpace, paramMinValues, paramMaxValues);
 
     //instantiating the likelihood function object
+    int num_poi = 4;
     cerr<< "Instantiating the likelihood function object and generating the samples"<<endl;
     double *t             = new double[tam];
     double* values_m      = new double[number_samples];
@@ -113,9 +112,10 @@ void compute(const FullEnvironment& env){
     double* data_mean     = new double[num_poi];
     double* data_std      = new double[num_poi];
     double* poi           = new double[num_poi]{1,3,6,30}; //defining the points in the time vector that will be used to fit the parameters (k and m) of the model
-
+    double Y0 = 1.0;
+    int dim = 1;
     //allocating memory for the data matrix[number_samples,tam]
-    cerr<<"allocating memory for the data matriz"<<endl;
+    cerr<<"allocating memory for the data matrix"<<endl;
     for(int i=0; i<number_samples; i++){
         data[i] = new double[tam];
     }
@@ -158,9 +158,10 @@ void compute(const FullEnvironment& env){
     /*************************************************************************************************************************************
      *                                              MEXER NA LIKELIHOOD                                                                   *
      *************************************************************************************************************************************/
-/*
-    cerr<<"Creating the likelihood object"<<endl;    
-	Likelihood<> lhood("like_", paramDomain, data_mean, t, data_std, poi, tam);
+
+    cerr<<"Creating the likelihood object"<<endl;   
+    Likelihood<> lhood("like_", paramDomain, num_poi, t0, t1, dt, poi, data_mean, data_std, Y0, dim); 
+//	Likelihood<> lhood("like_", paramDomain, data_mean, t, data_std, poi, tam);
     
     //defining the prior RV
     cerr<<"Defining the prior RV"<<endl;
@@ -187,7 +188,6 @@ void compute(const FullEnvironment& env){
               << ctime(&timevalNow.tv_sec)
               << std::endl;
     }
-	*/
 }
 
 

@@ -1,8 +1,8 @@
-QUESO_DIR = /home/LIBRARIES/QUESO-0.50.0/
-BOOST_DIR = /usr/local/lib
-GSL_DIR = /usr/local/
+QUESO_DIR = /home/LIBRARIES/queso/
+BOOST_DIR = /home/LIBRARIES/
+GSL_DIR = /home/LIBRARIES/gsl/
 
-INC_PATHS += -I. -I$(QUESO_DIR)/include -I$(BOOST_DIR)/include/boost/ -I$(GSL_DIR)/include/gsl/ 
+INC_PATHS += -I. -I$(QUESO_DIR)/include/ -I$(BOOST_DIR)/include/ -I$(GSL_DIR)/include/ 
 
 LIBS = \
 	-L$(QUESO_DIR)/lib -lqueso -lqueso-0.57\
@@ -22,8 +22,8 @@ clean:
 	rm -f *~
 	rm -f *.o
 
-teste1_gsl: main.o likelihood.o compute.o
-	$(CXX) main.o likelihood.o compute.o -o teste1_gsl $(LIBS)
+teste1_gsl: main.o likelihood.o compute.o func.o
+	$(CXX) main.o likelihood.o compute.o func.o -o teste1_gsl $(LIBS)
 
 %.o:%.cpp
 	echo $(INC_PATHS)
