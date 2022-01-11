@@ -17,7 +17,7 @@ GRVY DIR     =
 GLPK DIR     = 
 HDF5 DIR     = 
 --------------------------------------------------------------------------------------------------------------
-Beginning run at Tue Jan  4 13:50:56 2022
+Beginning run at Tue Jan 11 10:39:27 2022
 
 Entering StatisticalInverseProblem<P_V,P_M>::constructor(): prefix = , alternativeOptionsValues = 0, m_env.optionsInputFileName() = main.inp
 Leaving StatisticalInverseProblem<P_V,P_M>::constructor(): prefix = ip_
@@ -50,21 +50,21 @@ Finished generating 180000 positions, current rejection percentage = 99.9994 %
 Finished generating 200000 positions, current rejection percentage = 99.9995 %
 Finished the generation of Markov chain ip_mh_rawChain, with sub 200000 positions
 Some information about this chain:
-  Chain run time       = 27.6509 seconds
+  Chain run time       = 25.4392 seconds
 
  Breaking of the chain run time:
 
-  Candidate run time   = 1.57973 seconds (5.71311%)
+  Candidate run time   = 1.3697 seconds (5.38423%)
   Num target calls  = 399999
-  Target d. run time   = 0.738619 seconds (2.67123%)
-  Avg target run time   = 1.84655e-06 seconds
-  Mh alpha run time    = 8.89049 seconds (32.1527%)
-  Dr alpha run time    = 15.5494 seconds (56.2346%)
+  Target d. run time   = 0.639456 seconds (2.51366%)
+  Avg target run time   = 1.59864e-06 seconds
+  Mh alpha run time    = 8.3012 seconds (32.6315%)
+  Dr alpha run time    = 14.3634 seconds (56.4615%)
 ----------------------   --------------
-  Sum                  = 26.7582 seconds (96.7716%)
+  Sum                  = 24.6737 seconds (96.9909%)
 
  Other run times:
-  DR run time          = 17.0475 seconds (61.6528%)
+  DR run time          = 15.6663 seconds (61.5831%)
   AM run time          = 0 seconds (0%)
   Number of DRs = 199999(num_DRs/chain_size = 0.999995)
   Out of target support in DR = 0
@@ -113,5 +113,5 @@ In MetropolisHastingsSG<P_V,P_M>::generateSequence(), prefix = ip_mh_: closed ge
 
 In SequentialVectorRealizer<V,M>::constructor(): m_chain.subSequenceSize() = 10000
 
-Ending run at Tue Jan  4 13:51:27 2022
-Total run time = 31 seconds
+Ending run at Tue Jan 11 10:39:56 2022
+Total run time = 29 seconds
