@@ -3,9 +3,15 @@
 template<class V, class M>
 Likelihood<V,M>::Likelihood(const char* prefix, const VectorSet<V, M>& domain, int& poi, double& t0, double& t1, double& dt, double* points, double* data_mean, double* std_data, double& Y0, int& dim):BaseScalarFunction<V,M>(prefix,domain), m_data_mean(poi), m_stdDevs(poi){
     for(int i = 0; i<poi; i++){
-    	this->m_data_mean.push_back(data_mean[i]); 
-	this->m_stdDevs.push_back(std_data[i]); 
-	this->m_poi.push_back(points[i]); 
+    	cout<<"Desvio_construtor recebido: "<<std_data[i]<<endl;
+	cout<<"Media construtor recebida: "<<data_mean[i]<<endl;
+	cout<<"poi construtor recebido: "<<points[i]<<endl;
+	this->m_data_mean.insert(m_data_mean.begin()+i,data_mean[i]); 
+	this->m_stdDevs.insert(m_stdDevs.begin()+i,std_data[i]); 
+	this->m_poi.insert(m_poi.begin()+i,points[i]); 
+	cout<<"Desvio_constutor armazenado: "<<m_stdDevs.at(i)<<endl;
+	cout<<"poi construtor armazenado: "<<m_poi.at(i)<<endl;
+    	cout<<"media construtor armazenado: "<<m_data_mean.at(i)<<endl;
     }
     this->numPoi = poi; 
     this->t0 = t0; 
@@ -47,9 +53,11 @@ int Likelihood<V,M>::my_system(double , const double* y, double* f, void *info){
 template<class V, class M>
 double Likelihood<V, M>::lnValue(const V& domainVector) const{
     //definindo parametro para calculos
+    cout<<"lnValue"<<endl;
     double k = domainVector[0];
     double m = domainVector[1];
-    
+    cout<<"Parametro likelihood: "<<endl;
+    cout<<"k\t"<<k<<"\tm\t"<<m<<endl;    
     double params[]={k, m};
 
     //definindo parametros para a integral
@@ -71,20 +79,29 @@ double Likelihood<V, M>::lnValue(const V& domainVector) const{
     //calcular o erro em cada ponto
     for(int i=0; i<numPoi; i++){
 	Y0[0] = this->Y0;
-        int status = gsl_odeiv_evolve_apply(e, c, s, &sys, &t, t1, &dt, Y0);
-	std_Devs[i] = m_stdDevs[i];
-	
+	int status = gsl_odeiv_evolve_apply(e, c, s, &sys, &t, t1, &dt, Y0);
+	cout<<"gsl_status_integrate: "<<status<<endl;
+	cout<<"Y0: "<<Y0[0]<<endl;
+	std_Devs[i] = m_stdDevs.at(i);
+	cout<<"Desvio: "<<std_Devs[i]<<endl;
+	cout<<"Desvio main: "<<m_stdDevs.at(i)<<endl;	
 	//calculando o erro
         erro[i] = Y0[0] - m_data_mean[i];
+	cout<<"erro "<<i<<" "<<erro[i]<<endl;
     }
 
     //norma do erro
-    double misfitValue = pow(norm(erro)/norm(std_Devs),2);
-    
+    double misfitValue=0;
+    misfitValue = norm(erro)/norm(std_Devs);
+    misfitValue = pow(misfitValue,2);
+
+    cout<<"gsl_odeiv_evolve_free"<<endl;
     gsl_odeiv_evolve_free (e);
+    cout<<"gsl_odeiv_control_free"<<endl;
     gsl_odeiv_control_free(c);
+    cout<<"gsl_odeiv_step_free"<<endl;
     gsl_odeiv_step_free   (s);
-    return -1.5*misfitValue;
+    return -.5*misfitValue;
 }
 
 
@@ -93,6 +110,7 @@ Likelihood<V,M>::~Likelihood(){}
 
 template<class V, class M>
 double Likelihood<V,M>::actualValue(const V& paramValues, const V* paramDirection, V* gradVector, M* hessianMatrix, V* hessianEffect) const{
+   cout<<"Erro no actualValue?"<<endl;
    return std::exp(this->lnValue(paramValues));
 }
 

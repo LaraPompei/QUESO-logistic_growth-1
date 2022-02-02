@@ -28,7 +28,7 @@ ip_mh_initialProposalCovMatrix_dataInputFileType = m
 
 
 ip_mh_rawChain_dataInputFileName    = .                                     # Name of date file that contains the raw chain ["."]
-ip_mh_rawChain_size                 = 200000                               # Size of the raw chain
+ip_mh_rawChain_size                 = 200000                              # Size of the raw chain
 ip_mh_rawChain_generateExtra        = 0                                     # (?) [0]
 ip_mh_rawChain_displayPeriod        = 20000                                # [500]
 ip_mh_rawChain_measureRunTimes      = 1                                     # [1]

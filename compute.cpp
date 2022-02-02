@@ -64,8 +64,9 @@ void filling_matrix(double* t, double** data, double* values_m, double* values_k
     mu    = 15; //mean value of the normal distribution
     sigma = 1.0; //standard deviation of the normal distribution
     normal_distribution<double> normal_dist(mu,sigma);
-    
+    cout<< "Filling Matrix"<<endl;
     //filling the matrix
+    cout<<"k\tm\tdata[i][0]\tdata[i][1]\tdata[i][2]\tdata[i][3]"<<endl;
     for (int i =0; i<number_samples; i++) {
 	state_type x = {1.0};
         values_k[i] = lognormal_dist(engine);
@@ -75,7 +76,7 @@ void filling_matrix(double* t, double** data, double* values_m, double* values_k
 	position = i;
         //chamar o odeint para preencher a matriz
 	boost::numeric::odeint::integrate_const(rk4(), my_system_boost, x, t0, t1, dt, my_observer);
-	cout  << value_k << " " << value_M << " " << data[i][0] << " " << data[i][1] << " " << data[i][2] << " " << data[i][3] << "\n";
+	cout  << value_k << "\t" << value_M << "\t" << data[i][0] << "\t" << data[i][1] << "\t" << data[i][2] << "\t" << data[i][3] << "\n";
     }
 }
 
@@ -84,7 +85,7 @@ void compute(const FullEnvironment& env){
 
     gettimeofday(&timevalNow, NULL);
     if (env.fullRank() == 0){
-        cout<<"\nBeginning run of 'Example 1: Log-Normal Distribution Function (0.5,.2)' example at "<<ctime(&timevalNow.tv_sec)<<endl;
+        cerr<<"\nBeginning run of 'Example 1: Log-Normal Distribution Function (0.5,.2)' example at "<<ctime(&timevalNow.tv_sec)<<endl;
     }
     env.fullComm().Barrier();
     env.subComm().Barrier();
@@ -93,7 +94,7 @@ void compute(const FullEnvironment& env){
     cerr<<"instantiating the parameter space.."<<endl;
     VectorSpace<> paramSpace(env, "param_", 2, NULL);
 
-    //defining the domain of a
+    //defining the domain of k e m 
     cerr<<"instantiating the parameter domain"<<endl;
     GslVector paramMinValues(paramSpace.zeroVector());
     GslVector paramMaxValues(paramSpace.zeroVector());
@@ -115,21 +116,21 @@ void compute(const FullEnvironment& env){
     double Y0 = 1.0;
     int dim = 1;
     //allocating memory for the data matrix[number_samples,tam]
-    cerr<<"allocating memory for the data matrix"<<endl;
+    cout<<"allocating memory for the data matrix"<<endl;
     for(int i=0; i<number_samples; i++){
         data[i] = new double[tam];
     }
 
     //vector t is filled with [0.0,50] interval catching each number after 0.5
-    cerr<<"Filling vector t"<<endl<<"t[ ";
+    cout<<"Filling vector t"<<endl<<"t[ ";
     for (int i = 0; i<tam; i++){
         t[i] = i*spacing_points;
-        cerr<<t[i]<<" ";
+        cout<<t[i]<<" ";
     }
-    cerr<<"]"<<endl;
+    cout<<"]"<<endl;
     
     //generating and filling the matrix
-    cerr<<"Generating and filling the matrix"<<endl;
+    cout<<"Generating and filling the matrix"<<endl;
     filling_matrix(t,data,values_m,values_k);
 
     //instantiating the data_mean and data_std arrays
@@ -139,30 +140,25 @@ void compute(const FullEnvironment& env){
     }
 
     //data mean
-    cerr<<"Calculating the mean of the data"<<endl;
+    cout<<"Calculating the mean of the data"<<endl;
     for(int i = 0; i < num_poi;i++){
         for(int j=0; j<number_samples; j++){
             data_mean[i] += data[j][i]/number_samples;
         }
     }
     //standard deviation
-    cerr<<"Calculating the standard deviation"<<endl;
+    cout<<"Calculating the standard deviation"<<endl;
     for(int i = 0; i < num_poi;i++){
         for(int j=0; j<number_samples; j++){
             data_std[i] += pow((data[j][i] - data_mean[i]),2);
         }
         data_std[i] = sqrt(data_std[i]/number_samples);
-        cerr<<"Para t = "<<i<<endl<<"Data mean: "<<data_mean[i]<<endl<<"Data standard deviation: "<<data_std[i]<<endl;
+        cout<<"Para t = "<<i<<endl<<"Data mean: "<<data_mean[i]<<endl<<"Data standard deviation: "<<data_std[i]<<endl;
     }
-
-    /*************************************************************************************************************************************
-     *                                              MEXER NA LIKELIHOOD                                                                   *
-     *************************************************************************************************************************************/
 
     cerr<<"Creating the likelihood object"<<endl;   
     Likelihood<> lhood("like_", paramDomain, num_poi, t0, t1, dt, poi, data_mean, data_std, Y0, dim); 
-//	Likelihood<> lhood("like_", paramDomain, data_mean, t, data_std, poi, tam);
-    
+     
     //defining the prior RV
     cerr<<"Defining the prior RV"<<endl;
     UniformVectorRV<> priorRV("prior_",paramDomain);
@@ -180,11 +176,14 @@ void compute(const FullEnvironment& env){
     GslMatrix proposalCovMatrix(paramSpace.zeroVector());
 
     proposalCovMatrix(0,0) = pow(abs(paramInitials[0])/20.0, 2.0);
+    proposalCovMatrix(1,1) = pow(abs(paramInitials[1])/20.0, 2.0);
 
+    cerr<<"Inicio do mcmc"<<endl;
     ip.solveWithBayesMetropolisHastings(NULL, paramInitials, &proposalCovMatrix);
+    cerr<<"Fim do mcmc"<<endl;
 
     if (env.fullRank() == 0) {
-        cout << "Ending run of 'Example 1: Log-Normal Distribution Function (0.5,.2)' example at "
+        cerr << "Ending run of 'Example 1: Log-Normal Distribution Function (0.5,.2)' example at "
               << ctime(&timevalNow.tv_sec)
               << std::endl;
     }
