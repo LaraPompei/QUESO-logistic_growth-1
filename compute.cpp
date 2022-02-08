@@ -175,9 +175,9 @@ void compute(const FullEnvironment& env){
 
     GslMatrix proposalCovMatrix(paramSpace.zeroVector());
 
-    proposalCovMatrix(0,0) = pow(abs(paramInitials[0])/20.0, 2.0);
-    proposalCovMatrix(1,1) = pow(abs(paramInitials[1])/20.0, 2.0);
-
+    proposalCovMatrix(0,0) = pow(abs(paramInitials[0]), 2.0)/number_samples;
+    proposalCovMatrix(1,1) = pow(abs(paramInitials[1]), 2.0)/number_samples;
+	    
     cerr<<"Inicio do mcmc"<<endl;
     ip.solveWithBayesMetropolisHastings(NULL, paramInitials, &proposalCovMatrix);
     cerr<<"Fim do mcmc"<<endl;
