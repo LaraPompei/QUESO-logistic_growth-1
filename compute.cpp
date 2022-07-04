@@ -17,7 +17,7 @@ double dt = 0.1;
 double value_k = 0;
 double value_M = 0;
 int position = 0;
-double** data = new double*[number_samples];
+double** data_points = new double*[number_samples];
 
 // Defining a shorthand for the type of the mathematical state
 typedef std::vector< double > state_type;
@@ -34,22 +34,22 @@ void my_system_boost(const state_type& x , state_type& dxdt, const double& t){
 void my_observer(const state_type& x, const double& t){
     
     if(t == 1*spacing_points){
-        data[position][0] = x[0]; 
+        data_points[position][0] = x[0]; 
     }
     else if(t == 3*spacing_points){
-        data[position][1] = x[0]; 
+        data_points[position][1] = x[0]; 
     }
     else if(t == 6*spacing_points){
-        data[position][2] = x[0]; 
+        data_points[position][2] = x[0]; 
     }
     else if(t == 30*spacing_points){
-        data[position][3] = x[0]; 
+        data_points[position][3] = x[0]; 
     }
 	
 }
 
 
-void filling_matrix(double* t, double** data, double* values_m, double* values_k){
+void filling_matrix(double* t, double* values_m, double* values_k){
     mt19937 engine; // uniform random bit engine
     
     // seed the URBG
@@ -66,7 +66,7 @@ void filling_matrix(double* t, double** data, double* values_m, double* values_k
     normal_distribution<double> normal_dist(mu,sigma);
     cout<< "Filling Matrix"<<endl;
     //filling the matrix
-    cout<<"k\tm\tdata[i][0]\tdata[i][1]\tdata[i][2]\tdata[i][3]"<<endl;
+    cout<<"k\tm\tdata_points[i][0]\tdata_points[i][1]\tdata_points[i][2]\tdata_points[i][3]"<<endl;
     for (int i =0; i<number_samples; i++) {
 	state_type x = {1.0};
         values_k[i] = lognormal_dist(engine);
@@ -76,7 +76,7 @@ void filling_matrix(double* t, double** data, double* values_m, double* values_k
 	position = i;
         //chamar o odeint para preencher a matriz
 	boost::numeric::odeint::integrate_const(rk4(), my_system_boost, x, t0, t1, dt, my_observer);
-	cout  << value_k << "\t" << value_M << "\t" << data[i][0] << "\t" << data[i][1] << "\t" << data[i][2] << "\t" << data[i][3] << "\n";
+	cout  << value_k << "\t" << value_M << "\t" << data_points[i][0] << "\t" << data_points[i][1] << "\t" << data_points[i][2] << "\t" << data_points[i][3] << "\n";
     }
 }
 
@@ -115,10 +115,10 @@ void compute(const FullEnvironment& env){
     double* poi           = new double[num_poi]{1,3,6,30}; //defining the points in the time vector that will be used to fit the parameters (k and m) of the model
     double Y0 = 1.0;
     int dim = 1;
-    //allocating memory for the data matrix[number_samples,tam]
-    cout<<"allocating memory for the data matrix"<<endl;
+    //allocating memory for the data_points matrix[number_samples,tam]
+    cout<<"allocating memory for the data_points matrix"<<endl;
     for(int i=0; i<number_samples; i++){
-        data[i] = new double[tam];
+        data_points[i] = new double[tam];
     }
 
     //vector t is filled with [0.0,50] interval catching each number after 0.5
@@ -131,26 +131,26 @@ void compute(const FullEnvironment& env){
     
     //generating and filling the matrix
     cout<<"Generating and filling the matrix"<<endl;
-    filling_matrix(t,data,values_m,values_k);
+    filling_matrix(t,values_m,values_k);
 
-    //instantiating the data_mean and data_std arrays
+    //instantiating the data_points_mean and data_std arrays
     for (int i=0; i<num_poi; i++){
         data_mean[i] = 0.0;
         data_std[i]  = 0.0;
     }
 
-    //data mean
-    cout<<"Calculating the mean of the data"<<endl;
+    //data_points mean
+    cout<<"Calculating the mean of the data_points"<<endl;
     for(int i = 0; i < num_poi;i++){
         for(int j=0; j<number_samples; j++){
-            data_mean[i] += data[j][i]/number_samples;
+            data_mean[i] += data_points[j][i]/number_samples;
         }
     }
     //standard deviation
     cout<<"Calculating the standard deviation"<<endl;
     for(int i = 0; i < num_poi;i++){
         for(int j=0; j<number_samples; j++){
-            data_std[i] += pow((data[j][i] - data_mean[i]),2);
+            data_std[i] += pow((data_points[j][i] - data_mean[i]),2);
         }
         data_std[i] = sqrt(data_std[i]/number_samples);
         cout<<"Para t = "<<i<<endl<<"Data mean: "<<data_mean[i]<<endl<<"Data standard deviation: "<<data_std[i]<<endl;
@@ -194,29 +194,29 @@ void compute(const FullEnvironment& env){
 
 /*
 
-void save_data(double* model, double** baseModel, double* data, double* values_of_a){
-    fstream a_data, a_mcmc, model_data, model_mcmc;
+void save_data_points(double* model, double** baseModel, double* data, double* values_of_a){
+    fstream a_data_points, a_mcmc, model_data, model_mcmc;
     char fileName[50];
 
     //writing original a on file
-    sprintf(fileName, "a_data.m");
-    a_data.open(fileName, ios_base::out);
-    a_data<<"a_data = [";
+    sprintf(fileName, "a_data_points.m");
+    a_data_points.open(fileName, ios_base::out);
+    a_data_points<<"a_data = [";
     for(int i=0 ; i<number_samples; i++){
-        a_data<<data[i]<<endl;
+        a_data_points<<data[i]<<endl;
     }
-    a_data<<"];"<<endl;
-    a_data.close();
+    a_data_points<<"];"<<endl;
+    a_data_points.close();
 
     //writing original model on file
-    sprintf(fileName, "model_data.m");
-    model_data.open(fileName, ios_base::out);
-    model_data<<"model_data = [";
+    sprintf(fileName, "model_data_points.m");
+    model_data_points.open(fileName, ios_base::out);
+    model_data_points<<"model_data = [";
     for(int i=0 ; i<number_samples; i++){
-        model_data<<baseModel[i][poi]<<endl;
+        model_data_points<<baseModel[i][poi]<<endl;
     }
-    model_data<<"];"<<endl;
-    model_data.close();
+    model_data_points<<"];"<<endl;
+    model_data_points.close();
 
     //writing mcmc a on file
 

@@ -1,6 +1,6 @@
-QUESO_DIR = /home/LIBRARIES/queso/
-BOOST_DIR = /home/LIBRARIES/
-GSL_DIR = /home/LIBRARIES/gsl/
+QUESO_DIR = /home/Library/Queso
+BOOST_DIR = /home/Library/Boost
+GSL_DIR = /home/Library/Gsl
 
 INC_PATHS += -I. -I$(QUESO_DIR)/include/ -I$(BOOST_DIR)/include/ -I$(GSL_DIR)/include/ 
 
